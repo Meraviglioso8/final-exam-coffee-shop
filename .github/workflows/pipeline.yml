@@ -1,16 +1,17 @@
 name: Scan, Tag, and Push Multiple Docker Images
 
 on:
-  # Trigger on pull request merges to main or develop
   pull_request:
     branches:
       - main
-      - develop
-    types: [closed]  #when the pull request is closed (merged)
+    types: [closed] 
 
   schedule:
-    - cron: '0 0 * * *'  # Runs at midnight UTC every day for develop branch
-      if: ${{ github.ref == 'refs/heads/develop' }}
+    - cron: '0 0 * * *'  # Runs at midnight UTC every day
+  
+  push:
+    branches:
+      - develop
 
   workflow_dispatch:
     inputs:
@@ -22,6 +23,7 @@ on:
 jobs:
   scan_and_push_images:
     runs-on: ubuntu-latest
+
 
     steps:
       - name: Checkout repository
@@ -36,6 +38,7 @@ jobs:
           username: meraviglioso8
           password: ${{ secrets.DOCKER_PASSWORD }}  
 
+      # Set environment variable based on the branch or workflow input
       - name: Set environment variable
         id: set_environment
         run: |
@@ -52,11 +55,25 @@ jobs:
           fi
           echo "Environment set to $ENV_TAG"
 
+      # Only continue if the current branch is `develop`
+      - name: Check if branch is develop
+        run: |
+          if [[ "${GITHUB_REF}" != "refs/heads/develop" ]]; then
+            echo "This cron job only runs on the develop branch."
+            exit 0  # Exit the job early if not on the develop branch
+          fi
+
       # Install Trivy
       - name: Install Trivy
         run: |
           curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb -o trivy.deb
           sudo dpkg -i trivy.deb
+      
+      # Set GitHub Token for Authenticated Requests for lower rate limiting
+      - name: Set GitHub Token for Trivy
+        run: |
+          echo "${{ secrets.GH_TOKEN }}" > ~/.github_token
+          export GITHUB_TOKEN=$(cat ~/.github_token)
 
       # Define Docker username and Images List
       - name: Define Docker username and Images List
@@ -93,8 +110,8 @@ jobs:
 
             trivy image --no-progress --exit-code 1 $image >> trivy-scan-report.txt
 
-            VERSION_TAG=$(git rev-parse --short HEAD)  # Use short commit SHA as the version tag
-            IMAGE_TAG="${ENV_TAG}-${VERSION_TAG}"     # Add environment (dev/prod) in the tag
+            VERSION_TAG=$(git rev-parse --short HEAD)
+            IMAGE_TAG="${ENV_TAG}-${VERSION_TAG}"
             docker tag $image $image:$IMAGE_TAG
 
             docker push $image:$IMAGE_TAG
