@@ -80,8 +80,8 @@ jobs:
 
             docker push $image:$IMAGE_TAG
 
-            docker tag $image $image:latest
-            docker push $image:latest
+            docker tag $image $image:${ENV_TAG}-latest
+            docker push $image:${ENV_TAG}-latest
           done
 
       # Step 7: Upload Trivy Scan Report as Artifact (text file)
