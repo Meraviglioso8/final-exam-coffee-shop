@@ -49,7 +49,7 @@ jobs:
           
           # Define the list of images you want to pull and process
           echo "IMAGES_LIST=${DOCKER_USERNAME}/rabbitmq, \
-                 ${DOCKER_USERNAME}/postgre, \
+                 ${DOCKER_USERNAME}/postgres, \
                  ${DOCKER_USERNAME}/go-coffeeshop-product, \
                  ${DOCKER_USERNAME}/go-coffeeshop-counter, \
                  ${DOCKER_USERNAME}/go-coffeeshop-kitchen, \
