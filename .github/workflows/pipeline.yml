@@ -68,6 +68,12 @@ jobs:
         run: |
           curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb -o trivy.deb
           sudo dpkg -i trivy.deb
+      
+      # Set GitHub Token for Authenticated Requests for lower rate limiting
+      - name: Set GitHub Token for Trivy
+        run: |
+          echo "${{ secrets.GH_TOKEN }}" > ~/.github_token
+          export GITHUB_TOKEN=$(cat ~/.github_token)
 
       # Define Docker username and Images List
       - name: Define Docker username and Images List
