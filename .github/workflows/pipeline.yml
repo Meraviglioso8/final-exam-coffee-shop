@@ -34,7 +34,6 @@ jobs:
       # Step 4: Install Trivy
       - name: Install Trivy
         run: |
-          # Download and install Trivy
           curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb -o trivy.deb
           sudo dpkg -i trivy.deb
 
@@ -70,10 +69,8 @@ jobs:
 
             docker pull $image
 
-            # Scan the image with Trivy and output to a text file (trivy-scan-report.txt)
-            trivy image --no-progress --exit-code 1 $image > trivy-scan-report.txt
+            trivy image --no-progress --exit-code 1 $image >> trivy-scan-report.txt
 
-            # Tag the image with the version tag (based on Git commit SHA)
             VERSION_TAG=$(git rev-parse --short HEAD)  # Use short commit SHA as the version tag
             IMAGE_TAG="${ENV_TAG}-${VERSION_TAG}"     # Add environment (dev/prod) in the tag
             docker tag $image $image:$IMAGE_TAG
