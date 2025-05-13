@@ -86,7 +86,7 @@ jobs:
 
       # Step 7: Upload Trivy Scan Report as Artifact (text file)
       - name: Upload Trivy Scan Report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: trivy-scan-report
           path: trivy-scan-report.txt
