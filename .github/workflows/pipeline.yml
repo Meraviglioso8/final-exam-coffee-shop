@@ -1,0 +1,72 @@
+name: Scan, Tag, and Push Multiple Docker Images
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the main branch
+
+jobs:
+  scan_and_push_images:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Docker Buildx (optional for multi-platform builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Step 3: Log in to Docker Hub (or your private registry)
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 4: Define Docker username and image list
+      - name: Define Docker username and Images List
+        id: images
+        run: |
+          export DOCKER_USERNAME=myusername  # Define the Docker username here
+          echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> $GITHUB_ENV
+          
+          # Define the list of images you want to pull and process
+          echo "IMAGES_LIST=${DOCKER_USERNAME}/my-image1, \
+                 ${DOCKER_USERNAME}/my-image2, \
+                 ${DOCKER_USERNAME}/my-image3, \
+                 ${DOCKER_USERNAME}/my-image4, \
+                 ${DOCKER_USERNAME}/my-image5, \
+                 ${DOCKER_USERNAME}/my-image6, \
+                 ${DOCKER_USERNAME}/my-image7, \
+                 ${DOCKER_USERNAME}/my-image8" >> $GITHUB_ENV
+
+      # Step 5: Pull, Scan, Tag, and Push each image in the list
+      - name: Pull, Scan, Tag, and Push Docker Images
+        run: |
+          # Split the images into an array
+          IFS=',' read -r -a images <<< "$IMAGES_LIST"
+
+          # Loop over each image
+          for image in "${images[@]}"
+          do
+            echo "Processing image: $image"
+
+            # Step 5.1: Pull the Docker image
+            docker pull $image
+
+            # Step 5.2: Scan the image with Trivy
+            trivy image --no-progress --exit-code 1 $image
+
+            # Step 5.3: Tag the image with a version number (using Git commit SHA)
+            VERSION_TAG=$(git rev-parse --short HEAD)  # Use short commit SHA as the version tag
+            docker tag $image $image:$VERSION_TAG
+
+            # Step 5.4: Push the image with version tag
+            docker push $image:$VERSION_TAG
+
+            # Step 5.5: Push the latest tag
+            docker tag $image $image:latest
+            docker push $image:latest
+          done
