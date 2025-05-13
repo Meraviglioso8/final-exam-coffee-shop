@@ -9,6 +9,7 @@ DOCKER_IMAGES=(
   "cuongopswat/go-coffeeshop-kitchen"
   "cuongopswat/go-coffeeshop-counter"
   "cuongopswat/go-coffeeshop-product"
+  "containrrr/watchtower:latest"
   "postgres:14-alpine"
   "rabbitmq:3.11-management-alpine"
 )

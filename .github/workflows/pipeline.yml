@@ -1,9 +1,17 @@
 name: Scan, Tag, and Push Multiple Docker Images
 
 on:
-  push:
+  # Trigger on pull request merges to main or develop
+  pull_request:
     branches:
       - main
+      - develop
+    types: [closed]  #when the pull request is closed (merged)
+
+  schedule:
+    - cron: '0 0 * * *'  # Runs at midnight UTC every day for develop branch
+      if: ${{ github.ref == 'refs/heads/develop' }}
+
   workflow_dispatch:
     inputs:
       environment:
@@ -16,28 +24,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Step 3: Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: meraviglioso8
           password: ${{ secrets.DOCKER_PASSWORD }}  
 
-      # Step 4: Install Trivy
+      - name: Set environment variable
+        id: set_environment
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "ENV_TAG=prod" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/develop" ]]; then
+            echo "ENV_TAG=dev" >> $GITHUB_ENV
+          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${GITHUB_EVENT_INPUTS_ENVIRONMENT}" == "dev" ]]; then
+            echo "ENV_TAG=dev" >> $GITHUB_ENV
+          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${GITHUB_EVENT_INPUTS_ENVIRONMENT}" == "prod" ]]; then
+            echo "ENV_TAG=prod" >> $GITHUB_ENV
+          else
+            echo "ENV_TAG=dev" >> $GITHUB_ENV  # Default to 'dev' for manual trigger if no input provided
+          fi
+          echo "Environment set to $ENV_TAG"
+
+      # Install Trivy
       - name: Install Trivy
         run: |
           curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb -o trivy.deb
           sudo dpkg -i trivy.deb
 
-      # Step 5: Define Docker username and Images List
+      # Define Docker username and Images List
       - name: Define Docker username and Images List
         id: images
         run: |
@@ -49,6 +70,7 @@ jobs:
           # Define the list of images you want to pull and process
           echo "IMAGES_LIST=${DOCKER_USERNAME}/rabbitmq, \
                  ${DOCKER_USERNAME}/postgres, \
+                 ${DOCKER_USERNAME}/watchtower, \
                  ${DOCKER_USERNAME}/go-coffeeshop-product, \
                  ${DOCKER_USERNAME}/go-coffeeshop-counter, \
                  ${DOCKER_USERNAME}/go-coffeeshop-kitchen, \
@@ -56,7 +78,7 @@ jobs:
                  ${DOCKER_USERNAME}/go-coffeeshop-proxy, \
                  ${DOCKER_USERNAME}/go-coffeeshop-web" >> $GITHUB_ENV
 
-      # Step 6: Pull, Scan, Tag, and Push each image in the list
+      # Pull, Scan, Tag, and Push each image in the list
       - name: Pull, Scan, Tag, and Push Docker Images
         run: |
           # Split the images into an array
@@ -81,7 +103,7 @@ jobs:
             docker push $image:${ENV_TAG}-latest
           done
 
-      # Step 7: Upload Trivy Scan Report as Artifact (text file)
+      # Upload Trivy Scan Report as Artifact
       - name: Upload Trivy Scan Report
         uses: actions/upload-artifact@v4
         with:

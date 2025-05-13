@@ -5,7 +5,7 @@ networks:
 services:
   # 1) PostgreSQL
   postgres:
-    image: meraviglioso8/postgres:14-alpine
+    image: meraviglioso8/postgres:dev-latest
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -15,10 +15,16 @@ services:
       - "5432:5432"
     networks:
       - coffeeshop-net
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # 2) RabbitMQ
   rabbitmq:
-    image: meraviglioso8/rabbitmq:3.11-management-alpine
+    image: meraviglioso8/rabbitmq:dev-latest
     restart: always
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
@@ -30,10 +36,17 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - coffeeshop-net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # 3) Product service (gRPC on 5001)
   product:
-    image: meraviglioso8/go-coffeeshop-product
+    image: meraviglioso8/go-coffeeshop-product:dev-latest
+    restart: always
     depends_on:
       - postgres
       - rabbitmq
@@ -46,7 +59,8 @@ services:
 
   # 4) Counter service (gRPC on 5002)
   counter:
-    image: meraviglioso8/go-coffeeshop-counter
+    image: meraviglioso8/go-coffeeshop-counter:dev-latest
+    restart: always
     depends_on:
       - product
       - postgres
@@ -65,7 +79,8 @@ services:
 
   # 5) Barista service
   barista:
-    image: meraviglioso8/go-coffeeshop-barista
+    image: meraviglioso8/go-coffeeshop-barista:dev-latest
+    restart: always
     depends_on:
       - postgres
       - rabbitmq
@@ -80,7 +95,8 @@ services:
 
   # 6) Kitchen service
   kitchen:
-    image: meraviglioso8/go-coffeeshop-kitchen
+    image: meraviglioso8/go-coffeeshop-kitchen:dev-latest
+    restart: always
     depends_on:
       - postgres
       - rabbitmq
@@ -95,7 +111,8 @@ services:
 
   # 7) Reverse-proxy / gateway (port 5000)
   proxy:
-    image: meraviglioso8/go-coffeeshop-proxy
+    image: meraviglioso8/go-coffeeshop-proxy:dev-latest
+    restart: always
     depends_on:
       - product
       - counter
@@ -112,14 +129,29 @@ services:
 
   # 8) Web frontend (port 8888)
   web:
-    image: meraviglioso8/go-coffeeshop-web
+    image: meraviglioso8/go-coffeeshop-web:dev-latest
+    restart: always
     depends_on:
       - proxy
     environment:
-      REVERSE_PROXY_URL: http://localhost:5000
+      REVERSE_PROXY_URL: http://proxy:5000
       WEB_PORT: "8888"
     ports:
       - "8888:8888"
+    networks:
+      - coffeeshop-net
+
+  # 9) Watchtower – auto-pulls and restarts services when new images are available
+  watchtower:
+    image: meraviglioso8/watchtower:dev-latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:
+      - --interval
+      - "300"         # check every 5 minutes
+      - --cleanup     # remove old images after updating
+      - coffeeshop-net/*  # watch all containers on this network
     networks:
       - coffeeshop-net
 
