@@ -15,21 +15,30 @@ DOCKER_IMAGES=(
 
 pull_and_push_image() {
   local image=$1
-  local image_name=$(echo $image | sed 's/.*\///')
+  # Remove content before '/' and after the first ':' (if any)
+  local image_name=$(echo $image | sed 's/^[^/]*\///;s/:.*//')
   local target_image="$DOCKER_HUB_USERNAME/$image_name"
+  
   echo "Pulling image: $TARGET_REGISTRY/$image"
   docker pull "$TARGET_REGISTRY/$image"
 
-  echo "Tagging image: $TARGET_REGISTRY/$image -> $target_image"
-  docker tag "$TARGET_REGISTRY/$image" "$target_image"
+  local version_tag=$(git rev-parse --short HEAD) 
+  echo "Tagging image: $TARGET_REGISTRY/$image -> $target_image:$version_tag"
+  docker tag "$TARGET_REGISTRY/$image" "$target_image:$version_tag"
 
-  echo "Pushing image to Docker Hub: $target_image"
-  docker push "$target_image"
+  echo "Pushing image to Docker Hub with version tag: $target_image:$version_tag"
+  docker push "$target_image:$version_tag"
+
+  echo "Tagging image with 'latest': $TARGET_REGISTRY/$image -> $target_image:latest"
+  docker tag "$TARGET_REGISTRY/$image" "$target_image:latest"
+
+  echo "Pushing image to Docker Hub with 'latest' tag: $target_image:latest"
+  docker push "$target_image:latest"
+
 }
 
-# Main process
 for image in "${DOCKER_IMAGES[@]}"; do
   pull_and_push_image "$image"
 done
 
-echo "All images have been pulled and pushed to Docker Hub!"
+echo "Done"
