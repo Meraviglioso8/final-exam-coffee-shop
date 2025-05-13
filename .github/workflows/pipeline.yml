@@ -16,18 +16,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      # Step 3: Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: meraviglioso8
           password: ${{ secrets.DOCKER_PASSWORD }}  
 
+      # Step 4: Install Trivy
+      - name: Install Trivy
+        run: |
+          # Download and install Trivy
+          curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb -o trivy.deb
+          sudo dpkg -i trivy.deb
+
+      # Step 5: Define Docker username and Images List
       - name: Define Docker username and Images List
         id: images
         run: |
@@ -46,7 +57,7 @@ jobs:
                  ${DOCKER_USERNAME}/go-coffeeshop-proxy, \
                  ${DOCKER_USERNAME}/go-coffeeshop-web" >> $GITHUB_ENV
 
-      # Step 5: Pull, Scan, Tag, and Push each image in the list
+      # Step 6: Pull, Scan, Tag, and Push each image in the list
       - name: Pull, Scan, Tag, and Push Docker Images
         run: |
           # Split the images into an array
@@ -59,14 +70,18 @@ jobs:
 
             docker pull $image
 
+            # Scan the image with Trivy
             trivy image --no-progress --exit-code 1 $image
 
+            # Tag the image with the version tag (based on Git commit SHA)
             VERSION_TAG=$(git rev-parse --short HEAD)  # Use short commit SHA as the version tag
             IMAGE_TAG="${ENV_TAG}-${VERSION_TAG}"     # Add environment (dev/prod) in the tag
             docker tag $image $image:$IMAGE_TAG
 
+            # Push the versioned tag
             docker push $image:$IMAGE_TAG
 
+            # Tag and push the latest tag
             docker tag $image $image:latest
             docker push $image:latest
           done
