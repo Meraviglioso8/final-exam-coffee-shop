@@ -1,0 +1,128 @@
+networks:
+  coffeeshop-net:
+    driver: bridge
+
+services:
+  # 1) PostgreSQL
+  postgres:
+    image: meraviglioso8/postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - coffeeshop-net
+
+  # 2) RabbitMQ
+  rabbitmq:
+    image: meraviglioso8/rabbitmq:3.11-management-alpine
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - coffeeshop-net
+
+  # 3) Product service (gRPC on 5001)
+  product:
+    image: meraviglioso8/go-coffeeshop-product
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      APP_NAME: ${APP_NAME}
+    ports:
+      - "5001:5001"
+    networks:
+      - coffeeshop-net
+
+  # 4) Counter service (gRPC on 5002)
+  counter:
+    image: meraviglioso8/go-coffeeshop-counter
+    depends_on:
+      - product
+      - postgres
+      - rabbitmq
+    environment:
+      APP_NAME: ${APP_NAME}
+      IN_DOCKER: "true"
+      PG_URL: ${PG_URL}
+      PG_DSN_URL: ${PG_DSN_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+      PRODUCT_CLIENT_URL: ${PRODUCT_CLIENT_URL}
+    ports:
+      - "5002:5002"
+    networks:
+      - coffeeshop-net
+
+  # 5) Barista service
+  barista:
+    image: meraviglioso8/go-coffeeshop-barista
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      APP_NAME: coffeeshop-barista
+      IN_DOCKER: "true"
+      PG_URL: ${PG_URL}
+      PG_DSN_URL: ${PG_DSN_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+    networks:
+      - coffeeshop-net
+
+  # 6) Kitchen service
+  kitchen:
+    image: meraviglioso8/go-coffeeshop-kitchen
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      APP_NAME: coffeeshop-kitchen
+      IN_DOCKER: "true"
+      PG_URL: ${PG_URL}
+      PG_DSN_URL: ${PG_DSN_URL}
+      RABBITMQ_URL: ${RABBITMQ_URL}
+    networks:
+      - coffeeshop-net
+
+  # 7) Reverse-proxy / gateway (port 5000)
+  proxy:
+    image: meraviglioso8/go-coffeeshop-proxy
+    depends_on:
+      - product
+      - counter
+    environment:
+      APP_NAME: coffeeshop-proxy
+      GRPC_PRODUCT_HOST: product
+      GRPC_PRODUCT_PORT: "5001"
+      GRPC_COUNTER_HOST: counter
+      GRPC_COUNTER_PORT: "5002"
+    ports:
+      - "5000:5000"
+    networks:
+      - coffeeshop-net
+
+  # 8) Web frontend (port 8888)
+  web:
+    image: meraviglioso8/go-coffeeshop-web
+    depends_on:
+      - proxy
+    environment:
+      REVERSE_PROXY_URL: http://localhost:5000
+      WEB_PORT: "8888"
+    ports:
+      - "8888:8888"
+    networks:
+      - coffeeshop-net
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
