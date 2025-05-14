@@ -1,13 +1,9 @@
 name: Scan, Tag, and Push Multiple Docker Images
 
 on:
-  pull_request:
-    branches:
-      - main
-    types: [closed] 
-  
   push:
     branches:
+      - main 
       - develop
 
   workflow_dispatch:
