@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-2"
+  region = "us-west-2"
 }
 
 resource "aws_s3_bucket" "tfstate" {
@@ -28,7 +28,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate" {
   }
 }
 
-resource "aws_key_pair" "ssh_key" {
+resource "aws_key_pair" "ssh_key_dev" {
   key_name   = "huyen_ssh_key_dev" 
   public_key = file("~/.ssh/id_ed25519_dev.pub")  
 

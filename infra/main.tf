@@ -6,7 +6,7 @@ terraform {
   backend "s3" {
     bucket         = "huyen-tfstate-backend"
     key            = "dev/terraform.tfstate"
-    region         = "us-east-2"
+    region         = "us-west-2"
     encrypt        = true
   }
 }
@@ -40,12 +40,24 @@ module "docker_ec2" {
 
   user_data = <<-EOF
     #!/bin/bash
+    # Update the system and install necessary dependencies
     yum update -y
     amazon-linux-extras install docker -y
+    yum install -y git
     systemctl enable docker
     systemctl start docker
     usermod -aG docker ec2-user
+
+    # Clone the repository (replace with your repository URL)
+    git clone https://github.com/Meraviglioso8/final-exam-coffee-shop.git /home/ec2-user/coffee-shop
+
+    # Go to the 'dev' folder inside the cloned repository
+    cd /home/ec2-user/coffee-shop/dev
+
+    # Run docker-compose to build and start containers
+    docker-compose up --build -d
   EOF
 
   tags = var.common_tags
 }
+

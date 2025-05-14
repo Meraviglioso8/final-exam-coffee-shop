@@ -1,4 +1,4 @@
-region = "us-east-2"
+region = "us-west-2"
 
 # EC2 Instance Settings
 instance_name = "huyen-dev-docker-host"
