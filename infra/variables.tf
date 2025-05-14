@@ -2,7 +2,7 @@
 variable "region" {
   description = "The AWS region to deploy resources in"
   type        = string
-  default     = "us-east-2"  # Default region if not provided
+  default     = "us-west-2"  # Default region if not provided
 }
 
 # EC2 Instance related variables
