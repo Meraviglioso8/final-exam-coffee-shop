@@ -2,7 +2,7 @@ region = "us-west-2"
 
 # EC2 Instance Settings
 instance_name = "huyen-dev-docker-host"
-ami           = "ami-096af71d77183c8f8"
+ami           = "ami-04999cd8f2624f834"
 instance_type = "t3.micro"
 key_name      = "huyen_ssh_key_dev"
 name = "huyen-final-exam-dev-vpc"
@@ -27,14 +27,14 @@ security_group_description = "HTTP and SSH from internet"
 
 security_group_ingress = [
   {
-    description = "Allow SSH from anywhere"
+    description = "Allow SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   },
   {
-    description = "Allow HTTP from anywhere"
+    description = "Allow HTTP"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -44,7 +44,7 @@ security_group_ingress = [
 
 security_group_egress = [
   {
-    description = "Allow HTTPS to anywhere"
+    description = "Allow HTTPS"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"

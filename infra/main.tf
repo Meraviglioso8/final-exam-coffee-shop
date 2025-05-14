@@ -26,38 +26,57 @@ module "custom_vpc" {
 }
 
 # EC2 Instance
-module "docker_ec2" {
-  source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "~> 5.0"
+# module "docker_ec2" {
+#   source  = "terraform-aws-modules/ec2-instance/aws"
+#   version = "~> 5.0"
 
-  name                       = var.instance_name
-  ami                        = var.ami
-  instance_type              = var.instance_type
-  key_name                   = var.key_name
-  subnet_id                  = module.custom_vpc.public_subnet_ids[0] 
-  vpc_security_group_ids     = [module.custom_vpc.security_group_id]
-  associate_public_ip_address = true
+#   name                       = var.instance_name
+#   ami                        = var.ami
+#   instance_type              = var.instance_type
+#   key_name                   = var.key_name
+#   subnet_id                  = module.custom_vpc.public_subnet_ids[0] 
+#   vpc_security_group_ids     = [module.custom_vpc.security_group_id]
+#   associate_public_ip_address = true
 
-  user_data = <<-EOF
-    #!/bin/bash
-    # Update the system and install necessary dependencies
-    yum update -y
-    amazon-linux-extras install docker -y
-    yum install -y git
-    systemctl enable docker
-    systemctl start docker
-    usermod -aG docker ec2-user
+#   user_data = <<-EOF
+#     #!/bin/bash
+#     yum update -y
+#     yum install -y docker git nginx
+#     systemctl start docker
+#     systemctl enable docker
+#     usermod -aG docker ec2-user
+#     systemctl restart docker
 
-    # Clone the repository (replace with your repository URL)
-    git clone https://github.com/Meraviglioso8/final-exam-coffee-shop.git /home/ec2-user/coffee-shop
+#     systemctl start nginx
+#     systemctl enable nginx
 
-    # Go to the 'dev' folder inside the cloned repository
-    cd /home/ec2-user/coffee-shop/dev
+#     curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m) -o /usr/libexec/docker/cli-plugins/docker-compose
+#     chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
-    # Run docker-compose to build and start containers
-    docker-compose up --build -d
-  EOF
+#     docker compose version
 
-  tags = var.common_tags
-}
+#     git clone https://github.com/Meraviglioso8/final-exam-coffee-shop.git /home/ec2-user/coffee-shop
+
+#     echo "${file("../dev/.env")}" > /home/ec2-user/coffee-shop/dev/.env
+
+#     cd /home/ec2-user/coffee-shop/dev
+#     docker compose up --build -d
+
+#     sleep 2m
+
+#     rm -f /etc/nginx/nginx.conf
+#     echo "${file("../dev/nginx.conf")}" > /etc/nginx/nginx.conf
+
+#     chown root:nginx /etc/nginx/nginx.conf
+#     chmod 644 /etc/nginx/nginx.conf
+
+#     nginx -t
+#     systemctl restart nginx
+#   EOF
+
+#   tags = var.common_tags
+# }
+
+
+
 
