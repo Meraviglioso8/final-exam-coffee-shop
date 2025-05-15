@@ -4,3 +4,4 @@ metadata:
   name: coffeeshop-config
 data:
   APP_NAME: "coffeeshop-app"
+  PRODUCT_CLIENT_URL: "http://product:5001"

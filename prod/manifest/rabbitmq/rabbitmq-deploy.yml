@@ -24,12 +24,12 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: rabbitmq-secret
-                key: username
+                key: RABBITMQ_DEFAULT_USER
           - name: RABBITMQ_DEFAULT_PASS
             valueFrom:
               secretKeyRef:
                 name: rabbitmq-secret
-                key: password
+                key: RABBITMQ_DEFAULT_PASS
         volumeMounts:
           - name: rabbitmq-data
             mountPath: /var/lib/rabbitmq
