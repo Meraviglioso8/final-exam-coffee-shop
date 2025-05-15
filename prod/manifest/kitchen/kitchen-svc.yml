@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kitchen
+  namespace: coffeeshop
+spec:
+  selector:
+    app: kitchen
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP

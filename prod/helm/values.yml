@@ -1,0 +1,36 @@
+server:
+  service:
+    type: LoadBalancer
+    servicePortHttp: 30900
+    servicePortHttps: 30901
+
+repoServer:
+  initContainers:
+    - name: setup-gpg
+      image: busybox
+      command:
+        - sh
+        - -c
+        - |
+          mkdir -p /home/argocd/.gnupg && \
+          cp /tmp/gnupg-secret/private.key /home/argocd/.gnupg/ && \
+          chmod 700 /home/argocd/.gnupg && \
+          chmod 600 /home/argocd/.gnupg/private.key
+      volumeMounts:
+        - name: gpg-secret
+          mountPath: /tmp/gnupg-secret
+          readOnly: true
+        - name: gpg-writable
+          mountPath: /home/argocd/.gnupg
+
+  volumes:
+    - name: gpg-secret
+      secret:
+        secretName: gpg-private-key
+    - name: gpg-writable
+      emptyDir: {}
+
+  volumeMounts:
+    - name: gpg-writable
+      mountPath: /home/argocd/.gnupg
+
