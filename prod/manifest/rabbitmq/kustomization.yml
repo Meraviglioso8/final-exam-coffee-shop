@@ -8,4 +8,4 @@ resources:
   - rabbitmq-pv.yml
 
 generators:
-  - ksops.yaml
+  - ksops.yml

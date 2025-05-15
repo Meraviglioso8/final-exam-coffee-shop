@@ -15,4 +15,4 @@ resources:
 
 
 generators:
-  - ksops.yaml
+  - ksops.yml
