@@ -11,6 +11,7 @@ resources:
   - rabbitmq/
   - secret-and-more/
   - web/
+  - ksops.yaml
 
 
 generators:
