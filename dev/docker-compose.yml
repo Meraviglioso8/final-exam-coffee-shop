@@ -3,25 +3,6 @@ networks:
     driver: bridge
 
 services:
-  # 1) PostgreSQL
-  postgres:
-    image: meraviglioso8/postgres:dev-latest
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
-    networks:
-      - coffeeshop-net
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-
   # 2) RabbitMQ
   rabbitmq:
     image: meraviglioso8/rabbitmq:dev-latest
@@ -48,7 +29,6 @@ services:
     image: meraviglioso8/go-coffeeshop-product:dev-latest
     restart: always
     depends_on:
-      - postgres
       - rabbitmq
     environment:
       APP_NAME: ${APP_NAME}
@@ -63,7 +43,6 @@ services:
     restart: always
     depends_on:
       - product
-      - postgres
       - rabbitmq
     environment:
       APP_NAME: ${APP_NAME}
@@ -82,7 +61,6 @@ services:
     image: meraviglioso8/go-coffeeshop-barista:dev-latest
     restart: always
     depends_on:
-      - postgres
       - rabbitmq
     environment:
       APP_NAME: coffeeshop-barista
@@ -98,7 +76,6 @@ services:
     image: meraviglioso8/go-coffeeshop-kitchen:dev-latest
     restart: always
     depends_on:
-      - postgres
       - rabbitmq
     environment:
       APP_NAME: coffeeshop-kitchen
@@ -156,5 +133,4 @@ services:
       - coffeeshop-net
 
 volumes:
-  postgres_data:
   rabbitmq_data:
