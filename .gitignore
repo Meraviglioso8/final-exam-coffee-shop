@@ -13,8 +13,7 @@ terraform.*
 *.so
 *.dylib
 *.tfvars
-rabbitmq-secret.yml
-postgres-secret.yml
+
 # Test binary, built with `go test -c`
 *.test
 *.key
