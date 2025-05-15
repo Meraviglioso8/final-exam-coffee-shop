@@ -18,18 +18,24 @@ spec:
         image: meraviglioso8/go-coffeeshop-kitchen:dev-latest
         env:
           - name: APP_NAME
-            value: coffeeshop-kitchen
+            valueFrom:
+              configMapKeyRef:
+                name: coffeeshop-config
+                key: APP_NAME
           - name: IN_DOCKER
             value: "true"
           - name: PG_URL
             valueFrom:
               secretKeyRef:
-                name: db-credentials
+                name: postgres-secret
                 key: PG_URL
           - name: PG_DSN_URL
             valueFrom:
               secretKeyRef:
-                name: db-credentials
+                name: postgres-secret
                 key: PG_DSN_URL
           - name: RABBITMQ_URL
-            value: amqp://$(RABBITMQ_DEFAULT_USER):$(RABBITMQ_DEFAULT_PASS)@rabbitmq:5672/
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-secret
+                key: RABBITMQ_URL

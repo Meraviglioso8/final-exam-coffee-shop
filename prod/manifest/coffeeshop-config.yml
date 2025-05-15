@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coffeeshop-config
+data:
+  APP_NAME: "coffeeshop-app"
