@@ -5,5 +5,4 @@ resources:
   - kitchen-deploy.yml
   - kitchen-svc.yml
 
-generators:
-  - ksops.yml
+

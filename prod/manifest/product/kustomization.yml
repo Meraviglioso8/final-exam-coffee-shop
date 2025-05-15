@@ -5,5 +5,4 @@ resources:
   - product-deploy.yml
   - product-svc.yml
 
-generators:
-  - ksops.yml
+

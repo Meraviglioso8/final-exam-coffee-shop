@@ -5,5 +5,4 @@ resources:
   - proxy-deploy.yml
   - proxy-svc.yml
 
-generators:
-  - ksops.yml
+

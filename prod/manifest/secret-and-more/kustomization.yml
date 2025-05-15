@@ -6,5 +6,4 @@ resources:
   - rabbitmq-secret-enc.yml
   - namespace.yml
 
-generators:
-  - ksops.yml
+
