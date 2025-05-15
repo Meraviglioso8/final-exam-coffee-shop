@@ -5,7 +5,7 @@ resources:
   - namespace.yml
 
 generators:
- - kops-secret.yml
+  - kops-secret.yml
 
 generatorOptions:
   labels:
