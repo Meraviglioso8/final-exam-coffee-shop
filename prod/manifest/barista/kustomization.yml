@@ -5,5 +5,3 @@ resources:
   - barista-deploy.yml
   - barista-svc.yml
 
-generators:
-  - ksops.yml

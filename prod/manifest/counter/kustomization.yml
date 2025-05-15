@@ -5,5 +5,3 @@ resources:
   - counter-deploy.yml
   - counter-svc.yml
 
-generators:
-  - ksops.yml

@@ -7,5 +7,4 @@ resources:
   - rabbitmq-pvc.yml
   - rabbitmq-pv.yml
 
-generators:
-  - ksops.yml
+
