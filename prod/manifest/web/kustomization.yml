@@ -4,3 +4,6 @@ kind: Kustomization
 resources:
   - web-deploy.yml
   - web-svc.yml
+
+generators:
+  - ksops.yaml

@@ -12,3 +12,6 @@ resources:
   - secret-and-more/
   - web/
 
+
+generators:
+  - ksops.yaml
