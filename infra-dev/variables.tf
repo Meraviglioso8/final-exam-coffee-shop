@@ -141,3 +141,87 @@ variable "tags" {
     Project     = "networking"
   }
 }
+
+# Database
+# RDS/PostgreSQL inputs
+variable "db_name" {
+  description = "Initial database name"
+  type        = string
+  default     = "appdb"
+}
+
+variable "db_username" {
+  description = "Master DB username"
+  type        = string
+  default     = "postgres"
+}
+
+variable "db_engine_version" {
+  description = "PostgreSQL engine version"
+  type        = string
+  default     = "13.4"
+}
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage (GiB)"
+  type        = number
+  default     = 20
+}
+variable "db_password" {
+  description = "Password for dev"
+  type        = string
+  default     = "huyen"
+}
+
+variable "db_skip_final_snapshot" {
+  description = "Skip final snapshot on destroy"
+  type        = bool
+  default     = true
+}
+
+variable "db_deletion_protection" {
+  description = "Enable deletion protection for the RDS instance"
+  type        = bool
+  default     = false
+}
+
+# Connection
+variable "db_port" {
+  description = "The port on which the DB accepts connections"
+  type        = number
+  default     = 5432
+}
+
+# Availability / HA
+variable "db_multi_az" {
+  description = "Enable Multi-AZ (high-availability)"
+  type        = bool
+  default     = false
+}
+
+# Backups
+variable "db_backup_retention_period" {
+  description = "Days to retain automated backups (0=disabled)"
+  type        = number
+  default     = 7
+}
+
+# Storage
+variable "db_storage_type" {
+  description = "Type of storage (gp2, gp3, io1, etc.)"
+  type        = string
+  default     = "gp2"
+}
+
+# Public accessibility
+variable "db_publicly_accessible" {
+  description = "Make the DB publicly accessible"
+  type        = bool
+  default     = false
+}
