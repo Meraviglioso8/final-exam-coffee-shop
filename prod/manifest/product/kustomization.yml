@@ -4,3 +4,6 @@ kind: Kustomization
 resources:
   - product-deploy.yml
   - product-svc.yml
+
+generators:
+  - ksops.yaml

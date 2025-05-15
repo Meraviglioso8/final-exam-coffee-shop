@@ -4,3 +4,6 @@ kind: Kustomization
 resources:
   - proxy-deploy.yml
   - proxy-svc.yml
+
+generators:
+  - ksops.yaml

@@ -4,3 +4,6 @@ kind: Kustomization
 resources:
   - barista-deploy.yml
   - barista-svc.yml
+
+generators:
+  - ksops.yaml

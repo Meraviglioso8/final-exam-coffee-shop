@@ -4,3 +4,6 @@ kind: Kustomization
 resources:
   - counter-deploy.yml
   - counter-svc.yml
+
+generators:
+  - ksops.yaml
