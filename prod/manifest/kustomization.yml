@@ -9,7 +9,7 @@ resources:
   - product/
   - proxy/
   - rabbitmq/
-  - secret-and-more/
+  - secret/
   - web/
 
 
