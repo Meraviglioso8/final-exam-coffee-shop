@@ -3,3 +3,6 @@ kind: Kustomization
 
 resources:
   - ingress.yml
+
+generators:
+  - ksops.yaml
