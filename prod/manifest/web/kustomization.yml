@@ -5,5 +5,4 @@ resources:
   - web-deploy.yml
   - web-svc.yml
 
-generators:
-  - ksops.yml
+

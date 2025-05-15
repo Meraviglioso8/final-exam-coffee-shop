@@ -7,3 +7,6 @@ metadata:
     config.kubernetes.io/function: |
         exec:
           path: ksops
+files:
+  - postgres-secret-enc.yml
+  - rabbitmq-secret-enc.yml
