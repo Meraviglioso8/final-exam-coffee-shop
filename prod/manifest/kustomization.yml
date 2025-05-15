@@ -2,5 +2,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - postgres-secret-enc.yml
-  - rabbitmq-secret-enc.yml
+  - barista/
+  - counter/
+  - ingress/
+  - kitchen/
+  - product/
+  - proxy/
+  - rabbitmq/
+  - secret-and-more/
+  - web/
+
