@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product
+  namespace: coffeeshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+    spec:
+      containers:
+      - name: product
+        image: meraviglioso8/go-coffeeshop-product:dev-latest
+        ports:
+          - containerPort: 5001
+        env:
+          - name: APP_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: coffeeshop-config
+                key: APP_NAME

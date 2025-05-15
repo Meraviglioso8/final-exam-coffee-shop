@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: coffeeshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: meraviglioso8/go-coffeeshop-web:dev-latest
+        ports:
+          - containerPort: 8888
+        env:
+          - name: REVERSE_PROXY_URL
+            value: http://proxy:5000
+          - name: WEB_PORT
+            value: "8888"

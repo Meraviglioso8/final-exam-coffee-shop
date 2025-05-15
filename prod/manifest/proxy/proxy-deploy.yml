@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy
+  namespace: coffeeshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+    spec:
+      containers:
+      - name: proxy
+        image: meraviglioso8/go-coffeeshop-proxy:dev-latest
+        ports:
+          - containerPort: 5000
+        env:
+          - name: APP_NAME
+            value: coffeeshop-proxy
+          - name: GRPC_PRODUCT_HOST
+            value: product
+          - name: GRPC_PRODUCT_PORT
+            value: "5001"
+          - name: GRPC_COUNTER_HOST
+            value: counter
+          - name: GRPC_COUNTER_PORT
+            value: "5002"

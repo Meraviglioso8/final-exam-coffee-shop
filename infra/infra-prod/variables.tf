@@ -5,29 +5,6 @@ variable "region" {
   default     = "us-west-2"  # Default region if not provided
 }
 
-# EC2 Instance related variables
-variable "instance_name" {
-  description = "Name of the EC2 instance"
-  type        = string
-  default     = "docker-host"
-}
-
-variable "ami" {
-  description = "AMI ID for the EC2 instance"
-  type        = string
-}
-
-variable "instance_type" {
-  description = "Instance type for the EC2 instance"
-  type        = string
-  default     = "t3.micro"
-}
-
-variable "key_name" {
-  description = "Name of the key pair to associate with the EC2 instance"
-  type        = string
-}
-
 # Common tags
 variable "common_tags" {
   description = "Tags to apply to all resources"
@@ -177,6 +154,7 @@ variable "db_password" {
   description = "Password for dev"
   type        = string
   default     = "huyen"
+  sensitive   = true
 }
 
 variable "db_skip_final_snapshot" {
@@ -224,4 +202,44 @@ variable "db_publicly_accessible" {
   description = "Make the DB publicly accessible"
   type        = bool
   default     = false
+}
+
+variable "eks_cluster_role_arn" {
+  description = "ARN of the IAM role for the EKS cluster"
+  type        = string
+}
+
+variable "eks_node_role_arn" {
+  description = "ARN of the IAM role for the EKS worker nodes"
+  type        = string
+}
+
+variable "eks_node_desired_capacity" {
+  description = "Desired number of worker nodes"
+  type        = number
+  default     = 2
+}
+
+variable "eks_node_max_capacity" {
+  description = "Max number of worker nodes"
+  type        = number
+  default     = 3
+}
+
+variable "eks_node_min_capacity" {
+  description = "Min number of worker nodes"
+  type        = number
+  default     = 1
+}
+
+variable "eks_node_instance_types" {
+  description = "List of instance types for worker nodes"
+  type        = list(string)
+  default     = ["t3.medium"]
+}
+
+variable "ec2_ssh_key_name" {
+  description = "EC2 key pair name for SSH access to worker nodes"
+  type        = string
+  default     = null
 }

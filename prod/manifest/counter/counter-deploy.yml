@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counter
+  namespace: coffeeshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:
+      containers:
+      - name: counter
+        image: meraviglioso8/go-coffeeshop-counter:dev-latest
+        ports:
+          - containerPort: 5002
+        env:
+          - name: APP_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: coffeeshop-config
+                key: APP_NAME
+          - name: IN_DOCKER
+            value: "true"
+          - name: PG_URL
+            valueFrom:
+              secretKeyRef:
+                name: db-credentials
+                key: PG_URL
+          - name: PG_DSN_URL
+            valueFrom:
+              secretKeyRef:
+                name: db-credentials
+                key: PG_DSN_URL
+          - name: RABBITMQ_URL
+            value: amqp://$(RABBITMQ_DEFAULT_USER):$(RABBITMQ_DEFAULT_PASS)@rabbitmq:5672/
+          - name: PRODUCT_CLIENT_URL
+            valueFrom:
+              configMapKeyRef:
+                name: coffeeshop-config
+                key: PRODUCT_CLIENT_URL
