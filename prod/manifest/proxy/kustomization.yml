@@ -6,4 +6,4 @@ resources:
   - proxy-svc.yml
 
 generators:
-  - ksops.yaml
+  - ksops.yml

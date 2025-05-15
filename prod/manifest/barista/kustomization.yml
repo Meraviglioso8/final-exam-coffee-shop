@@ -6,4 +6,4 @@ resources:
   - barista-svc.yml
 
 generators:
-  - ksops.yaml
+  - ksops.yml

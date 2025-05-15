@@ -6,4 +6,4 @@ resources:
   - kitchen-svc.yml
 
 generators:
-  - ksops.yaml
+  - ksops.yml
