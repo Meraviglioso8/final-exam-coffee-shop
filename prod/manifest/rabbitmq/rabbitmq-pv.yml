@@ -11,3 +11,11 @@ spec:
   local:
     path: /mnt/data/rabbitmq
   persistentVolumeReclaimPolicy: Retain
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - ip-10-20-1-69.us-west-2.compute.internal
