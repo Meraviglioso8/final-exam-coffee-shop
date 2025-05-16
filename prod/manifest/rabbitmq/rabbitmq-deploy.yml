@@ -37,23 +37,23 @@ spec:
           exec:
             command: ["rabbitmqctl", "status"]
           initialDelaySeconds: 10
-          periodSeconds: 30
+          periodSeconds: 120
           timeoutSeconds: 5
           failureThreshold: 3
         livenessProbe:
           exec:
             command: ["rabbitmqctl", "status"]
           initialDelaySeconds: 10
-          periodSeconds: 30
+          periodSeconds: 120
           timeoutSeconds: 5
           failureThreshold: 3
         resources:
           requests:
-            cpu: 50m
-            memory: 150Mi
-          limits:
             cpu: 100m
-            memory: 300Mi
+            memory: 250Mi
+          limits:
+            cpu: 200m
+            memory: 500Mi
       volumes:
         - name: rabbitmq-data
           persistentVolumeClaim:
