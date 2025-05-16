@@ -12,10 +12,10 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-      - www.meraviglioso.id.vn
+      - huyen.meraviglioso.id.vn
     secretName: meraviglioso-id-vn-tls
   rules:
-  - host: www.meraviglioso.id.vn
+  - host: huyen.meraviglioso.id.vn
     http:
       paths:
       - path: /

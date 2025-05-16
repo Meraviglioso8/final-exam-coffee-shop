@@ -8,9 +8,9 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: www.meraviglioso.id.vn
+  commonName: huyen.meraviglioso.id.vn
   dnsNames:
-    - www.meraviglioso.id.vn
+    - huyen.meraviglioso.id.vn
   privateKey:
     algorithm: ECDSA
     size: 256

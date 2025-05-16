@@ -20,6 +20,6 @@ spec:
           - containerPort: 8888
         env:
           - name: REVERSE_PROXY_URL
-            value: https://www.meraviglioso.id.vn/proxy 
+            value: https://huyen.meraviglioso.id.vn/proxy 
           - name: WEB_PORT
             value: "8888"
