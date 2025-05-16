@@ -13,6 +13,7 @@ terraform.*
 *.so
 *.dylib
 *.tfvars
+secret-and-more
 
 # Test binary, built with `go test -c`
 *.test
