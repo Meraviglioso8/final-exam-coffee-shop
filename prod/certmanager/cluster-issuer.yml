@@ -2,14 +2,14 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
-  namespace: coffeeshop
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
     email: ttmhuyen2110@gmail.com
     privateKeySecretRef:
-      name: meraviglioso-id-vn-tls
+      name: letsencrypt-prod-account-key
+    preferredChain: "ISRG Root X2"
     solvers:
-    - http01:
-        ingress:
-          class: nginx
+      - http01:
+          ingress:
+            class: nginx
