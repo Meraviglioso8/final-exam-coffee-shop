@@ -5,7 +5,6 @@ resources:
   - coffeeshop-config.yml
   - barista/
   - counter/
-  - ingress/
   - kitchen/
   - product/
   - proxy/
