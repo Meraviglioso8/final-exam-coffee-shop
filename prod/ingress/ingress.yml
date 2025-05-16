@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: meraviglioso.id.vn
+  - host: www.meraviglioso.id.vn
     http:
       paths:
       - path: /proxy
