@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
   - barista-deploy.yml
   - barista-svc.yml
+  - barista-hpa.yml
 

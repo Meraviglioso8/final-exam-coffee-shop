@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
   - counter-deploy.yml
   - counter-svc.yml
+  - counter-hpa.yml
 

@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - kitchen-deploy.yml
   - kitchen-svc.yml
+  - kitchen-hpa.yml
 
 

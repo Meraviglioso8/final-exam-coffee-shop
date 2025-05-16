@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - product-deploy.yml
   - product-svc.yml
+  - product-hpa.yml
 
 

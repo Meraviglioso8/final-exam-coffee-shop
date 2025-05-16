@@ -23,3 +23,10 @@ spec:
             value: https://huyen.meraviglioso.id.vn/proxy 
           - name: WEB_PORT
             value: "8888"
+        resources:
+          requests:
+            cpu: 10m
+            memory: 8Mi
+          limits:
+            cpu: 40m
+            memory: 64Mi

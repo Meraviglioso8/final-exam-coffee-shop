@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - web-deploy.yml
   - web-svc.yml
+  - web-hpa.yml
 
 

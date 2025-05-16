@@ -6,5 +6,6 @@ resources:
   - rabbitmq-svc.yml
   - rabbitmq-pvc.yml
   - rabbitmq-pv.yml
+  - rabbitmq-hpa.yml
 
 

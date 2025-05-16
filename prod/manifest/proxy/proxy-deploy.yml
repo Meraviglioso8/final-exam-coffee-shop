@@ -29,3 +29,10 @@ spec:
             value: counter
           - name: GRPC_COUNTER_PORT
             value: "5002"
+        resources:
+          requests:
+            cpu: 10m
+            memory: 8Mi
+          limits:
+            cpu: 40m
+            memory: 64Mi

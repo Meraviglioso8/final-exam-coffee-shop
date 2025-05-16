@@ -46,3 +46,10 @@ spec:
               configMapKeyRef:
                 name: coffeeshop-config
                 key: PRODUCT_CLIENT_URL
+        resources:
+          requests:
+            cpu: 10m
+            memory: 8Mi
+          limits:
+            cpu: 40m
+            memory: 64Mi

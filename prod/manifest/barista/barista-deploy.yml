@@ -39,3 +39,10 @@ spec:
               secretKeyRef:
                 name: rabbitmq-secret
                 key: RABBITMQ_URL
+        resources:
+          requests:
+            cpu: 10m
+            memory: 8Mi
+          limits:
+            cpu: 40m
+            memory: 64Mi
