@@ -5,6 +5,7 @@ metadata:
   namespace: coffeeshop
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
   - host: www.meraviglioso.id.vn
@@ -15,7 +16,6 @@ spec:
         backend:
           service:
             name: proxy
-            namespace: coffeeshop
             port:
               number: 5000
       - path: /
@@ -23,6 +23,5 @@ spec:
         backend:
           service:
             name: web
-            namespace: coffeeshop
             port:
               number: 8888
