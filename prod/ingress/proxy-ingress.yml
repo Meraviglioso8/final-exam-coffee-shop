@@ -5,9 +5,15 @@ metadata:
   namespace: coffeeshop
   annotations:
     kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+      - www.meraviglioso.id.vn
+    secretName: meraviglioso-id-vn-tls
   rules:
   - host: www.meraviglioso.id.vn
     http:
