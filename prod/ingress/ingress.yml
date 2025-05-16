@@ -16,6 +16,7 @@ spec:
         backend:
           service:
             name: proxy
+            namespace: coffeeshop
             port:
               number: 5000
       - path: /
@@ -23,5 +24,6 @@ spec:
         backend:
           service:
             name: web
+            namespace: coffeeshop
             port:
               number: 8888
