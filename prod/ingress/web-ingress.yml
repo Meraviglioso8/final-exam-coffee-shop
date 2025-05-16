@@ -11,7 +11,7 @@ spec:
   tls:
   - hosts:
       - www.meraviglioso.id.vn
-    secretName: meraviglioso-id-vn-web-tls
+    secretName: meraviglioso-id-vn-tls
   rules:
   - host: www.meraviglioso.id.vn
     http:
