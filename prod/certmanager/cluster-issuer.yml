@@ -7,6 +7,8 @@ spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
     email: ttmhuyen2110@gmail.com
+    privateKeySecretRef:
+      name: meraviglioso-id-vn-tls
     solvers:
     - http01:
         ingress:
