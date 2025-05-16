@@ -35,20 +35,16 @@ spec:
             mountPath: /var/lib/rabbitmq
         readinessProbe:
           exec:
-            command:
-              - rabbitmqctl
-              - status
+            command: ["rabbitmqctl", "status"]
           initialDelaySeconds: 10
           periodSeconds: 30
           timeoutSeconds: 5
           failureThreshold: 3
         livenessProbe:
           exec:
-            command:
-              - rabbitmqctl
-              - status
-          initialDelaySeconds: 30
-          periodSeconds: 60
+            command: ["rabbitmqctl", "status"]
+          initialDelaySeconds: 10
+          periodSeconds: 30
           timeoutSeconds: 5
           failureThreshold: 3
         resources:
@@ -62,3 +58,4 @@ spec:
         - name: rabbitmq-data
           persistentVolumeClaim:
             claimName: rabbitmq-data-pvc
+      
