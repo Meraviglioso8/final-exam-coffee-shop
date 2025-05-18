@@ -13,6 +13,9 @@ spec:
       labels:
         app: web
     spec:
+      imagePullSecrets:
+        - name: docker-secret
+
       containers:
       - name: web
         image: meraviglioso8/go-coffeeshop-web:prod-latest
@@ -20,7 +23,7 @@ spec:
           - containerPort: 8888
         env:
           - name: REVERSE_PROXY_URL
-            value: https://huyen.meraviglioso.id.vn/proxy 
+            value: https://huyen.meraviglioso.id.vn/proxy
           - name: WEB_PORT
             value: "8888"
         resources:
