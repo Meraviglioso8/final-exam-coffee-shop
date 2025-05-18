@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: product
-        image: meraviglioso8/go-coffeeshop-product:dev-latest
+        image: meraviglioso8/go-coffeeshop-product:prod-latest
         ports:
           - containerPort: 5001
         env:

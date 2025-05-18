@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: rabbitmq
-        image: meraviglioso8/rabbitmq:dev-latest
+        image: meraviglioso8/rabbitmq:prod-latest
         ports:
           - containerPort: 5672
           - containerPort: 15672

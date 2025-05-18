@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: counter
-        image: meraviglioso8/go-coffeeshop-counter:dev-latest
+        image: meraviglioso8/go-coffeeshop-counter:prod-latest
         ports:
           - containerPort: 5002
         env:

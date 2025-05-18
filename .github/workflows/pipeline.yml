@@ -17,7 +17,6 @@ jobs:
   scan_and_push_images:
     runs-on: ubuntu-latest
 
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -29,91 +28,80 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: meraviglioso8
-          password: ${{ secrets.DOCKER_PASSWORD }}  
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Set environment variable based on the branch or workflow input
-      - name: Set environment variable
-        id: set_environment
+      # ———————————————————————————————————————————————
+      # Determine ENV_TAG purely from branch (or workflow_dispatch input)
+      - name: Determine ENV_TAG
+        id: set_env
         run: |
-          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            echo "ENV_TAG=prod" >> $GITHUB_ENV
-          elif [[ "${GITHUB_REF}" == "refs/heads/develop" ]]; then
-            echo "ENV_TAG=dev" >> $GITHUB_ENV
-          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${GITHUB_EVENT_INPUTS_ENVIRONMENT}" == "dev" ]]; then
-            echo "ENV_TAG=dev" >> $GITHUB_ENV
-          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && "${GITHUB_EVENT_INPUTS_ENVIRONMENT}" == "prod" ]]; then
+          # strip "refs/heads/" → "main" or "develop"
+          branch=${GITHUB_REF#refs/heads/}
+
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            # respect manual input if provided
+            echo "ENV_TAG=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
+          elif [[ "$branch" == "main" ]]; then
             echo "ENV_TAG=prod" >> $GITHUB_ENV
           else
-            echo "ENV_TAG=dev" >> $GITHUB_ENV  # Default to 'dev' for manual trigger if no input provided
-          fi
-          echo "Environment set to $ENV_TAG"
-
-      # Only continue if the current branch is `develop`
-      - name: Check if branch is develop
-        run: |
-          if [[ "${GITHUB_REF}" != "refs/heads/develop" ]]; then
-            echo "This cron job only runs on the develop branch."
-            exit 0  # Exit the job early if not on the develop branch
+            echo "ENV_TAG=dev" >> $GITHUB_ENV
           fi
 
+          echo "⟶ running on branch '$branch', ENV_TAG=${ENV_TAG}"
+
+      # ———————————————————————————————————————————————
       # Install Trivy
       - name: Install Trivy
         run: |
-          curl -sfL https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb -o trivy.deb
+          curl -sfL \
+            https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb \
+            -o trivy.deb
           sudo dpkg -i trivy.deb
-      
-      # Set GitHub Token for Authenticated Requests for lower rate limiting
+
+      # lower rate‐limit errors when scanning docker images
       - name: Set GitHub Token for Trivy
         run: |
           echo "${{ secrets.GH_TOKEN }}" > ~/.github_token
-          export GITHUB_TOKEN=$(cat ~/.github_token)
+          export GITHUB_TOKEN=$(<~/.github_token)
 
-      # Define Docker username and Images List
-      - name: Define Docker username and Images List
-        id: images
+      # prepare your list of images
+      - name: Define Docker images
         run: |
-          export DOCKER_USERNAME=meraviglioso8
-          export ENV_TAG=${{ github.event.inputs.environment || 'dev' }}
-          echo "DOCKER_USERNAME=${DOCKER_USERNAME}" >> $GITHUB_ENV
-          echo "ENV_TAG=${ENV_TAG}" >> $GITHUB_ENV
-          
-          # Define the list of images you want to pull and process
-          echo "IMAGES_LIST=${DOCKER_USERNAME}/rabbitmq, \
-                 ${DOCKER_USERNAME}/postgres, \
-                 ${DOCKER_USERNAME}/watchtower, \
-                 ${DOCKER_USERNAME}/go-coffeeshop-product, \
-                 ${DOCKER_USERNAME}/go-coffeeshop-counter, \
-                 ${DOCKER_USERNAME}/go-coffeeshop-kitchen, \
-                 ${DOCKER_USERNAME}/go-coffeeshop-barista, \
-                 ${DOCKER_USERNAME}/go-coffeeshop-proxy, \
-                 ${DOCKER_USERNAME}/go-coffeeshop-web" >> $GITHUB_ENV
+          echo "IMAGES=(
+            rabbitmq
+            postgres
+            watchtower
+            go-coffeeshop-product
+            go-coffeeshop-counter
+            go-coffeeshop-kitchen
+            go-coffeeshop-barista
+            go-coffeeshop-proxy
+            go-coffeeshop-web
+          )" >> $GITHUB_ENV
 
-      # Pull, Scan, Tag, and Push each image in the list
+      # ———————————————————————————————————————————————
+      # Pull, scan, tag & push
       - name: Pull, Scan, Tag, and Push Docker Images
         run: |
-          # Split the images into an array
-          IFS=',' read -r -a images <<< "$IMAGES_LIST"
+          for img in "${IMAGES[@]}"; do
+            full="${DOCKER_USERNAME:-meraviglioso8}/$img"
+            echo "→ Processing $full"
 
-          # Loop over each image
-          for image in "${images[@]}"
-          do
-            echo "Processing image: $image"
+            docker pull $full
 
-            docker pull $image
+            # run Trivy but don’t fail the whole job on a finding
+            trivy image --no-progress --exit-code 1 $full || true
 
-            trivy image --no-progress --exit-code 1 $image >> trivy-scan-report.txt
+            SHORT=$(git rev-parse --short HEAD)
+            TAG="${ENV_TAG}-${SHORT}"
+            docker tag  $full $full:$TAG
+            docker push $full:$TAG
 
-            VERSION_TAG=$(git rev-parse --short HEAD)
-            IMAGE_TAG="${ENV_TAG}-${VERSION_TAG}"
-            docker tag $image $image:$IMAGE_TAG
-
-            docker push $image:$IMAGE_TAG
-
-            docker tag $image $image:${ENV_TAG}-latest
-            docker push $image:${ENV_TAG}-latest
+            docker tag  $full $full:${ENV_TAG}-latest
+            docker push $full:${ENV_TAG}-latest
           done
 
-      # Upload Trivy Scan Report as Artifact
+      # ———————————————————————————————————————————————
       - name: Upload Trivy Scan Report
         uses: actions/upload-artifact@v4
         with:

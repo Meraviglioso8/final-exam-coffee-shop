@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: proxy
-        image: meraviglioso8/go-coffeeshop-proxy:dev-latest
+        image: meraviglioso8/go-coffeeshop-proxy:prod-latest
         ports:
           - containerPort: 5000
         env:

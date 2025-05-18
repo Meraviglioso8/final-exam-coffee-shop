@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: kitchen
-        image: meraviglioso8/go-coffeeshop-kitchen:dev-latest
+        image: meraviglioso8/go-coffeeshop-kitchen:prod-latest
         env:
           - name: APP_NAME
             valueFrom:
