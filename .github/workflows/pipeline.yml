@@ -3,7 +3,7 @@ name: Scan, Tag, and Push Multiple Docker Images
 on:
   push:
     branches:
-      - main 
+      - main
       - develop
 
   workflow_dispatch:
@@ -16,6 +16,8 @@ on:
 jobs:
   scan_and_push_images:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: meraviglioso8
 
     steps:
       - name: Checkout repository
@@ -27,30 +29,22 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: meraviglioso8
+          username: ${{ env.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # ———————————————————————————————————————————————
-      # Determine ENV_TAG purely from branch (or workflow_dispatch input)
       - name: Determine ENV_TAG
         id: set_env
         run: |
-          # strip "refs/heads/" → "main" or "develop"
           branch=${GITHUB_REF#refs/heads/}
-
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            # respect manual input if provided
             echo "ENV_TAG=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
           elif [[ "$branch" == "main" ]]; then
             echo "ENV_TAG=prod" >> $GITHUB_ENV
           else
             echo "ENV_TAG=dev" >> $GITHUB_ENV
           fi
+          echo "ENV_TAG is $ENV_TAG"
 
-          echo "⟶ running on branch '$branch', ENV_TAG=${ENV_TAG}"
-
-      # ———————————————————————————————————————————————
-      # Install Trivy
       - name: Install Trivy
         run: |
           curl -sfL \
@@ -58,16 +52,14 @@ jobs:
             -o trivy.deb
           sudo dpkg -i trivy.deb
 
-      # lower rate‐limit errors when scanning docker images
       - name: Set GitHub Token for Trivy
         run: |
           echo "${{ secrets.GH_TOKEN }}" > ~/.github_token
           export GITHUB_TOKEN=$(<~/.github_token)
 
-      # prepare your list of images
-      - name: Define Docker images
+      - name: Pull, Scan, Tag, and Push Docker Images
         run: |
-          echo "IMAGES=(
+          images=(
             rabbitmq
             postgres
             watchtower
@@ -77,31 +69,25 @@ jobs:
             go-coffeeshop-barista
             go-coffeeshop-proxy
             go-coffeeshop-web
-          )" >> $GITHUB_ENV
+          )
 
-      # ———————————————————————————————————————————————
-      # Pull, scan, tag & push
-      - name: Pull, Scan, Tag, and Push Docker Images
-        run: |
-          for img in "${IMAGES[@]}"; do
-            full="${DOCKER_USERNAME:-meraviglioso8}/$img"
-            echo "→ Processing $full"
+          for img in "${images[@]}"; do
+            full_image="${DOCKER_USERNAME}/${img}"
+            echo "Processing ${full_image}"
 
-            docker pull $full
+            docker pull "${full_image}"
 
-            # run Trivy but don’t fail the whole job on a finding
-            trivy image --no-progress --exit-code 1 $full || true
+            trivy image --no-progress --exit-code 1 "${full_image}" || true
 
-            SHORT=$(git rev-parse --short HEAD)
-            TAG="${ENV_TAG}-${SHORT}"
-            docker tag  $full $full:$TAG
-            docker push $full:$TAG
+            short_sha=$(git rev-parse --short HEAD)
+            image_tag="${ENV_TAG}-${short_sha}"
+            docker tag "${full_image}" "${full_image}:${image_tag}"
+            docker push "${full_image}:${image_tag}"
 
-            docker tag  $full $full:${ENV_TAG}-latest
-            docker push $full:${ENV_TAG}-latest
+            docker tag "${full_image}" "${full_image}:${ENV_TAG}-latest"
+            docker push "${full_image}:${ENV_TAG}-latest"
           done
 
-      # ———————————————————————————————————————————————
       - name: Upload Trivy Scan Report
         uses: actions/upload-artifact@v4
         with:
