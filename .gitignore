@@ -14,7 +14,7 @@ terraform.*
 *.dylib
 *.tfvars
 secret-and-more
-
+docker.json
 # Test binary, built with `go test -c`
 *.test
 *.key
