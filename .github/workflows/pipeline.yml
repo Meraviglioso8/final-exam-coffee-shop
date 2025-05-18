@@ -57,6 +57,10 @@ jobs:
           echo "${{ secrets.GH_TOKEN }}" > ~/.github_token
           export GITHUB_TOKEN=$(<~/.github_token)
 
+      - name: Initialize Trivy report
+        run: |
+          echo "Trivy scan report for $GITHUB_REPOSITORY @ $(date --iso-8601=seconds)" > trivy-scan-report.txt
+
       - name: Pull, Scan, Tag, and Push Docker Images
         run: |
           images=(
@@ -73,18 +77,18 @@ jobs:
 
           for img in "${images[@]}"; do
             full_image="${DOCKER_USERNAME}/${img}"
-            echo "Processing ${full_image}"
+            echo "=== Scanning $full_image ===" | tee -a trivy-scan-report.txt
 
             docker pull "${full_image}"
 
-            trivy image --no-progress --exit-code 1 "${full_image}" || true
+            trivy image --no-progress "${full_image}" | tee -a trivy-scan-report.txt || true
 
             short_sha=$(git rev-parse --short HEAD)
             image_tag="${ENV_TAG}-${short_sha}"
-            docker tag "${full_image}" "${full_image}:${image_tag}"
+            docker tag  "${full_image}" "${full_image}:${image_tag}"
             docker push "${full_image}:${image_tag}"
 
-            docker tag "${full_image}" "${full_image}:${ENV_TAG}-latest"
+            docker tag  "${full_image}" "${full_image}:${ENV_TAG}-latest"
             docker push "${full_image}:${ENV_TAG}-latest"
           done
 
