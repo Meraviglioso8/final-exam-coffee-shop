@@ -1,6 +1,8 @@
 # Coffee-shop
 ## 1. Summary: 
-
+- Reference repository: [go-coffeeshop](https://github.com/thangchung/go-coffeeshop/tree/main)
+- Overall flow
+![overall-flow](/images/coffeeshop.svg)
 ## 2. Architecture
 
 ## 3. Component description
