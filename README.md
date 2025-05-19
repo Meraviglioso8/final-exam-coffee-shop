@@ -418,8 +418,8 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
 
 ## 5. User guideline
 
-### **Development environment**
-## Resource
+## 5.1 **Development environment**
+## 5.1.1 Resource
 
 ## Prerequisites
 - Docker & Docker Compose installed  
@@ -536,7 +536,7 @@ docker-compose down --volumes
 docker rm -f coffeeshop-nginx
 ```
 
-## IaC (Include automate deploy docker compose in EC2 and NGINX)
+## 5.1.2. IaC (Include automate deploy docker compose in EC2 and NGINX)
 ## 1. Provision State Backend & SSH Keys
 
 ### 1.1 Navigate to the `s3-backend` directory
@@ -780,9 +780,9 @@ _Verify:_
 
 - **Rotate SSH keys**: update your local public key files, then re-run the s3-backend deployment steps.  
 
-### **Production environment**
-## **Resource**
-## Directory Structure
+## 5.2. **Production environment**
+## 5.2.1 **Resource**
+### Directory Structure
 
 ```
 prod
@@ -913,7 +913,7 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
 - Helm charts are managed separately for critical components such as ingress-nginx, cert-manager, metrics-server, and monitoring stack.  
 - Monitor Helm releases and Kubernetes resources regularly for health and updates.
 
-## **Using Argo CD to Deploy Production Resources**
+## 5.2.2. **Using Argo CD to Deploy Production Resources**
 
 ## Prerequisites
 
@@ -997,7 +997,7 @@ Or use the Argo CD web UI to view health, history, and logs.
 - Leverage Argo CD’s RBAC to manage team access  
 - Configure health checks and resource hooks in your manifests for better deployment control  
 - Use ApplicationSets for multi-cluster or multiple environment deployments  
-## **IaC**
+## 5.2.3. **IaC**
 ### Production Environment — User Guide
 
 ## Prerequisites
