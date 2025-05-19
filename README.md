@@ -46,13 +46,16 @@
 
 ## 2. Architecture
 ### 2.1 Development
-#### CICDCD Pipeline
+#### CI/CD Pipeline
 - Path: [.github/workflows/pipeline.yml](.github/workflows/pipeline.yml)
 - Workflow: 
 
 ![cicd-workflow](/images/cicd-dev-workflow.png)
+#### Terraform infrastructure
+- Path
+- Workflow
 
-
+![terraform-dev-workflow](/images/terraform-dev.png)
 ## 3. Component description
 
 ## 4. The homepage of the application
