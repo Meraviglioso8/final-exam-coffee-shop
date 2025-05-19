@@ -915,10 +915,6 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
 
 ## **Using Argo CD to Deploy Production Resources**
 
-This section guides you through deploying your production manifests with Argo CD, a GitOps continuous delivery tool for Kubernetes.
-
----
-
 ## Prerequisites
 
 - Argo CD installed and accessible (web UI and CLI)  
@@ -926,7 +922,6 @@ This section guides you through deploying your production manifests with Argo CD
 - Git repository containing your `prod/` manifests and kustomizations  
 - Access to modify Argo CD applications  
 
----
 
 ## Step-by-Step Deployment
 
@@ -996,8 +991,6 @@ Or use the Argo CD web UI to view health, history, and logs.
 - Push commits to your main branch  
 - Argo CD detects changes and automatically syncs to the cluster  
 
----
-
 ## Tips
 
 - Use `argocd app diff <app-name>` to preview changes before syncing  
@@ -1006,10 +999,6 @@ Or use the Argo CD web UI to view health, history, and logs.
 - Use ApplicationSets for multi-cluster or multiple environment deployments  
 ## **IaC**
 ### Production Environment — User Guide
-
-This guide explains how to deploy and manage the production AWS infrastructure using Terraform configuration.
-
----
 
 ## Prerequisites
 
@@ -1030,7 +1019,6 @@ This guide explains how to deploy and manage the production AWS infrastructure u
 - **EKS Cluster:** Kubernetes cluster running in the defined VPC.  
 - **EKS Node Group:** Managed node group with auto-scaling and optional SSH access.
 
----
 
 ## Deployment Steps
 
@@ -1152,7 +1140,7 @@ ec2_ssh_key_name = "huyen_ssh_key_prod"
    - Confirm Secrets Manager contains DB credentials.  
    - Confirm EKS cluster and node group are active.
 
----
+
 
 ## Post-deployment
 
@@ -1165,7 +1153,6 @@ ec2_ssh_key_name = "huyen_ssh_key_prod"
 - **Manage EKS Nodes:**  
   SSH access to nodes is enabled if `ec2_ssh_key_name` is configured.
 
----
 
 ## Maintenance
 
@@ -1181,7 +1168,6 @@ ec2_ssh_key_name = "huyen_ssh_key_prod"
 - **Backup:**  
   RDS backup retention is configurable via `db_backup_retention_period`.
 
----
 
 ## Destruction
 
@@ -1191,7 +1177,6 @@ To destroy all created resources:
 terraform destroy -var-file="terraform.tfvars"
 ```
 
----
 
 ## Notes
 
