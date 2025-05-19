@@ -612,70 +612,6 @@ cd ../infra-dev
 ```
 
 ### 2.2 Configure Variables
-
-```hcl
-region                      = "us-west-2"
-cidr_block                  = "10.0.0.0/16"
-public_subnet_cidrs         = ["10.0.1.0/24", "10.0.2.0/24"]
-private_subnet_cidrs        = ["10.0.3.0/24", "10.0.4.0/24"]
-security_group_name         = "coffeeshop-sg"
-security_group_description  = "Allow HTTP, SSH"
-security_group_ingress      = [
-    { from_port = 80,  to_port = 80,  protocol = "tcp", cidr_blocks = ["0.0.0.0/0"] },
-    { from_port = 22,  to_port = 22,  protocol = "tcp", cidr_blocks = ["YOUR_IP/32"] }
-]
-security_group_egress       = [
-    { from_port = 0,   to_port = 0,   protocol = "-1",  cidr_blocks = ["0.0.0.0/0"] }
-]
-common_tags                 = { Project = "coffeeshop"; Environment = "dev" }
-name                        = "coffeeshop-dev"
-ami                         = "ami-0123456789abcdef0"
-instance_type               = "t3.micro"
-key_name                    = "huyen_ssh_key_dev"
-db_name                     = "coffee"
-db_username                 = "admin"
-db_password                 = "SuperSecret!"
-db_port                     = 5432
-db_multi_az                 = false
-db_backup_retention_period  = 7
-db_storage_type             = "gp3"
-db_publicly_accessible      = false
-db_instance_class           = "db.t3.micro"
-db_allocated_storage        = 20
-db_skip_final_snapshot      = true
-db_deletion_protection      = false
-```
-### 2.3 Inspect `main.tf`
-
-#### Backend configuration
-
-```hcl
-terraform {
-    backend "s3" {
-    bucket  = "huyen-tfstate-backend"
-    key     = "dev/terraform.tfstate"
-    region  = "us-west-2"
-    encrypt = true
-    }
-}
-```
-#### VPC module usage
-
-```hcl
-module "custom_vpc" {
-    source                     = "./modules/vpc"
-    cidr_block                 = var.cidr_block
-    public_subnet_cidrs        = var.public_subnet_cidrs
-    private_subnet_cidrs       = var.private_subnet_cidrs
-    security_group_name        = var.security_group_name
-    security_group_description = var.security_group_description
-    security_group_ingress     = var.security_group_ingress
-    security_group_egress      = var.security_group_egress
-    common_tags                = var.common_tags
-    name                       = var.name
-}
-```
-### 2.4 Tfvars (Optional)
 - For better clarity, I suggest using tfvars file. Fill the template below and using -var-file= option to include
 ```hcl
 region = ""
@@ -753,7 +689,38 @@ db_backup_retention_period =
 db_storage_type           = 
 db_publicly_accessible    = 
 ```
-### 2.5 Deploy
+### 2.3 Inspect `main.tf`
+
+#### Backend configuration
+
+```hcl
+terraform {
+    backend "s3" {
+    bucket  = "huyen-tfstate-backend"
+    key     = "dev/terraform.tfstate"
+    region  = "us-west-2"
+    encrypt = true
+    }
+}
+```
+#### VPC module usage
+
+```hcl
+module "custom_vpc" {
+    source                     = "./modules/vpc"
+    cidr_block                 = var.cidr_block
+    public_subnet_cidrs        = var.public_subnet_cidrs
+    private_subnet_cidrs       = var.private_subnet_cidrs
+    security_group_name        = var.security_group_name
+    security_group_description = var.security_group_description
+    security_group_ingress     = var.security_group_ingress
+    security_group_egress      = var.security_group_egress
+    common_tags                = var.common_tags
+    name                       = var.name
+}
+```
+
+### 2.4 Deploy
 
 ```bash
 terraform init
