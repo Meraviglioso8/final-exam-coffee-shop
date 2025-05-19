@@ -818,8 +818,125 @@ prod
 │       ├── web-hpa.yml
 │       └── web-svc.yml
 ```
-
 ---
+## Ksops
+- As this repo using ksops to pushing secret to public repository, secret file may be unreadable, you can manually create another file based on the information in other yml file.
+- If you wanna set up Ksops, you need to do the upper step first. Template can be found in here
+```
+docker-secret.yml
+apiVersion: v1
+kind: Secret
+metadata:
+    name: docker-secret
+    namespace: coffeeshop
+type: kubernetes.io/dockerconfigjson
+data:
+    .dockerconfigjson: 
+```
+```
+postgres-secret.yml
+apiVersion: v1
+kind: Secret
+metadata:
+    name: postgres-secret
+    namespace: coffeeshop
+type: Opaque
+stringData:
+    PG_URL:
+    PG_DSN_URL:
+```
+```
+rabbitmq-secret.yml
+apiVersion: v1
+kind: Secret
+metadata:
+    name: rabbitmq-secret
+    namespace: coffeeshop
+type: Opaque
+stringData:
+    RABBITMQ_DEFAULT_USER:
+    RABBITMQ_DEFAULT_PASS:
+    RABBITMQ_URL:
+```
+1. **Generate an GPG key**
+```
+export GPG_NAME="k0s.nimtechnology.cluster"
+export GPG_COMMENT="argocd secrets"
+
+gpg --batch --full-generate-key <<EOF
+%no-protection
+Key-Type: 1
+Key-Length: 4096
+Subkey-Type: 1
+Subkey-Length: 4096
+Expire-Date: 0
+Name-Comment: ${GPG_COMMENT}
+Name-Real: ${GPG_NAME}
+EOF
+
+
+>>>>
+output
+>>>>
+gpg: key D8D1E3F39710B570 marked as ultimately trusted
+gpg: revocation certificate stored as '/root/.gnupg/openpgp-revocs.d/E580ABECFC7260E628574541D8D1E3F39710B570.rev'
+```
+2. **Get key ID**
+```
+gpg --list-secret-keys "${GPG_NAME}"
+
+>>>>
+output
+>>>>
+gpg: checking the trustdb
+gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+gpg: depth: 0  valid:   2  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 2u
+sec   rsa4096 2022-07-02 [SCEA]
+      E580ABECFC7260E628574541D8D1E3F39710B570 # This is ID
+uid           [ultimate] k0s.nimtechnology.cluster (argocd secrets)
+ssb   rsa4096 2022-07-02 [SEA]
+```
+3. **Export GPG_ID** (Optional)
+```
+export GPG_ID=02FFE7F59336E4499E5A66772C9152921C9F2B1C
+```
+4. **Create secret based on key**
+```
+gpg --export-secret-keys --armor "${GPG_ID}" |
+kubectl create secret generic sops-gpg \
+--namespace=argocd \
+--from-file=sops.asc=/dev/stdin
+
+>>>>
+output
+>>>>
+secret/sops-gpg created
+```
+5. **Encrypt using public key**
+```
+sops --encrypt --in-place secret.yaml
+```
+6. **Export public key for user to encrypt** (Optional)
+```
+gpg --export --armor "${GPG_ID}" > .sops.pub.asc
+gpg --import .sops.pub.asc
+
+>>>>
+output
+>>>>
+gpg: key D8D1E3F39710B570: "k0s.nimtechnology.cluster (argocd secrets)" not changed
+gpg: Total number processed: 1
+gpg:              unchanged: 1
+```
+7. **Modify /prod/manifest/secret/.sops.yaml file to the key ID just create**
+```
+creation_rules:
+  - path_regex: .*.yml
+    encrypted_regex: ^(data|stringData)$
+    pgp: 38910E8EAC1F5E80B4CB32DCC135D0FD0B3392BD # Change this
+```
+8. **Copy public key to ArgoCD UI**
+![gpg](/images/gpg.png)
 
 ## Helm Setup and Installation
 
