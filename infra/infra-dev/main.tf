@@ -26,7 +26,7 @@ module "custom_vpc" {
   name                       = var.name
 }
 
-#EC2 Instance
+# EC2 Instance
 module "docker_ec2" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "~> 5.0"
@@ -60,15 +60,21 @@ module "docker_ec2" {
 
     git clone https://github.com/Meraviglioso8/final-exam-coffee-shop.git /home/ec2-user/coffee-shop
 
-    echo "${file("../dev/.env")}" > /home/ec2-user/coffee-shop/dev/.env
+    echo "${file("../../dev/.env")}" > /home/ec2-user/coffee-shop/dev/.env
 
     cd /home/ec2-user/coffee-shop/dev
+    set -o allexport
+    source .env
+    set +o allexport
+
+    echo "$$DOCKER_PASS" | docker login $$\{DOCKER_REGISTRY:-docker.io\} \
+    --username "$$DOCKER_USER" --password-stdin
     docker compose up --build -d
 
-    sleep 2m
+    sleep 1m
 
     rm -f /etc/nginx/nginx.conf
-    echo "${file("../dev/nginx.conf")}" > /etc/nginx/nginx.conf
+    echo "${file("../../dev/nginx.conf")}" > /etc/nginx/nginx.conf
 
     chown root:nginx /etc/nginx/nginx.conf
     chmod 644 /etc/nginx/nginx.conf
@@ -127,7 +133,7 @@ resource "aws_db_instance" "postgres" {
 
 # 5) Store credentials in Secrets Manager
 resource "aws_secretsmanager_secret" "db_credentials" {
-  name        = "${var.name}-postgres-rds-credentials"
+  name        = "${var.name}-postgresdb-rds-credentials"
   description = "Master credentials for RDS PostgreSQL"
   tags        = var.common_tags
 }
