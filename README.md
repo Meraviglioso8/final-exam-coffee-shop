@@ -993,7 +993,7 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
 ## Usage Notes
 
 - Use the `kustomization.yml` files to deploy or update resources via `kubectl apply -k <directory>`.  
-- Organize your deployment pipeline to apply manifests in dependency order, e.g., secrets first, then services, then ingress.  
+- Organize your deployment pipeline to apply manifests in dependency order,  secrets first, then services, then ingress.  
 - Helm charts are managed separately for critical components such as ingress-nginx, cert-manager, metrics-server, and monitoring stack.  
 - Monitor Helm releases and Kubernetes resources regularly for health and updates.
 
@@ -1027,7 +1027,6 @@ argocd app create coffeeshop-prod \
   --path prod/manifest \
   --dest-server https://kubernetes.default.svc \
   --dest-namespace default \
-  --sync-policy automated \
   --auto-prune
 ```
 
@@ -1089,9 +1088,8 @@ Or use the Argo CD web UI to view health, history, and logs.
 - Terraform installed (v1.x recommended)  
 - AWS CLI configured with credentials and proper permissions  
 - SSH key pair available for EKS node access  
-- Required Terraform variables configured (e.g., in `terraform.tfvars`)
+- Required Terraform variables configured ( in `terraform.tfvars`)
 
----
 
 ## Key Components
 
@@ -1267,5 +1265,96 @@ terraform destroy -var-file="terraform.tfvars"
 - Ensure that your AWS IAM user/role has sufficient permissions for all AWS resources used.  
 - Avoid committing sensitive variables like passwords in source control. Use environment variables or encrypted files.  
 - Monitor the health and logs of EKS nodes and RDS instance regularly for performance and security.
+
+## 5.2.4. **Additional guildlines**
+- After deploying argocd, you can get the first use secret password for login with username: admin and
+```
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode
+```
+- Same for grafana login
+```
+ kubectl -n monitoring get secret kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
+```
+
+- Dashboard and alert is suggested to be manually set up.
+    - Suggest dashboard ID: (Import into grafana): 21073, 12575
+    - Used alert:
+        - (4xx-5xx): 
+        ```
+        (
+        sum by(ingress)(
+            rate(
+            nginx_ingress_controller_requests{status=~"[45].."}[1m]
+            )
+        )
+        > 0
+        )
+        or vector(0)
+
+        ```
+        - High memory in pod
+        ```
+        (
+            sum by(cluster, namespace, pod)(
+            container_memory_usage_bytes{namespace="coffeeshop"}
+            )
+            /
+            on(cluster, namespace, pod)
+            sum by(cluster, namespace, pod)(
+            cluster:namespace:pod_memory:active:kube_pod_container_resource_limits{namespace="coffeeshop"}
+            )
+        )
+        > 0.8
+        ```
+
+        - High CPU in pod
+        ```
+        (
+            sum by(cluster, namespace, pod)(
+            rate(container_cpu_usage_seconds_total{namespace="coffeeshop"}[1m])
+            )
+            /
+            on(cluster, namespace, pod)
+            sum by(cluster, namespace, pod)(
+            cluster:namespace:pod_cpu:active:kube_pod_container_resource_limits{namespace="coffeeshop"}
+            )
+        )
+        > 0.8
+        ``` 
+        - Reach Max HPA capacity
+        ```
+        (
+            kube_horizontalpodautoscaler_status_current_replicas{namespace="coffeeshop"}
+            /
+            on(namespace, horizontalpodautoscaler)
+            kube_horizontalpodautoscaler_spec_max_replicas{namespace="coffeeshop"}
+        )
+        > 0.99
+        ```
+        - Anomaly in ingress traffic
+        ```
+        increase(nginx_ingress_controller_requests{namespace="ingress-nginx"}[1m])
+            >
+        2 *
+        avg_over_time(
+            increase(nginx_ingress_controller_requests{namespace="ingress-nginx"}[1m])[1h:1m]
+        )
+        ```
+## 6. Room for improvement
+- Monitoring custom metrics. E.g. Monitor messages on rabbitmq for HPA scaling.
+- Adding more healthcheck, especially on database.
+- Adding load test.
+- Checking on deployment strategy.
+
+## 7. References
+- https://nimtechnology.com/2022/07/03/argocd-ksops-encrypting-resource-on-kustomise-and-argocd/
+- https://cert-manager.io/docs/usage/certificate/
+- https://medium.com/@thecloudarchitect/continuous-delivery-with-argo-cd-and-jenkins-building-a-robust-ci-cd-pipeline-for-kubernetes-d8932a82a12f
+- https://diagrams.mingrammer.com/
+- https://dev.to/aws-builders/monitor-and-visualize-nginx-ingress-controller-metrics-on-amazon-eks-with-prometheus-grafana-5gn7
+- https://github.com/viaduct-ai/kustomize-sops
+- https://grafana.com/grafana/dashboards/
+- https://community.letsencrypt.org/t/how-do-i-get-the-shortest-isrg-root-x2-ecdsa-chain-now/203207
+- https://docs.docker.com/compose/how-tos/environment-variables/set-environment-variables/
 
 
