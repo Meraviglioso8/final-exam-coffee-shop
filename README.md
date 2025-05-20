@@ -404,18 +404,45 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
 ```
 
 ## 4. The homepage of the application
-### 4.1 Homepage
+
+### DEV
+### 4.1. Homepage
+
+![homepage](/images/dev-homepage.png)
+
+
+
+### PROD
+### 4.1. Homepage
 
 ![homepage](/images/homepage.png)
 
-### 4.2 Counter
+### 4.2. Counter
 
 ![counter](/images/counter.png)
 
-### 4.3 Order list
+### 4.3. Order list
 
 ![orderlist](/images/orderlist.png)
 
+### 4.4. ArgoCD UI
+![argocd-ui](/images/argocd-ui.png)
+
+### 4.5. K9s checking resources
+![k9s](/images/k9s.png)
+
+### 4.6. Prometheus targets enpoint
+![prom](/images/prom-targets.png)
+
+### 4.7. Grafana UI
+![grafana](/images/grafana.png)
+
+### 4.8. Alerts
+![alert-grafana](/images/alert-grafana.png)
+
+![alert-grafana](/images/firing.png)
+
+![alert-grafana](/images/resolved.png)
 ## 5. User guideline
 
 ## 5.1 **Development environment**
