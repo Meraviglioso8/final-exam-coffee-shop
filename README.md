@@ -1,9 +1,20 @@
+---
+geometry: margin=1in
+fontsize: 12pt
+toc: true
+mainfont: "Liberation Serif"
+sansfont: "Liberation Sans"
+monofont: "DejaVu Sans Mono"
+header-includes:
+  - \usepackage{fontspec}
+---
+
 # Coffee-shop
-## 1. Summary: 
+## **1. Summary**: 
 - Reference repository: [go-coffeeshop](https://github.com/thangchung/go-coffeeshop/tree/main)
 - Overall flow
 
-![overall-flow](/images/coffeeshop.svg)
+![overall-flow](images/coffeeshop.svg)
 ### 1.1 Development
 #### [Resource](/dev/)
 - Include
@@ -44,55 +55,56 @@
         - output.tf
         - variables.tf
 
-## 2. Architecture
+## **2. Architecture**
 ### 2.1 Development
 #### CI/CD Pipeline
 - Path: [.github/workflows/pipeline.yml](.github/workflows/pipeline.yml)
 - Workflow: 
 
-![cicd-workflow](/images/cicd-dev-workflow.png)
+![cicd-workflow](images/cicd-dev-workflow.png)
 #### Terraform Infrastructure (and Architecture)
 - Path: [infra/infra-dev/](infra/infra-dev/)
 - Workflow
 
-![terraform-dev-workflow](/images/terraform-dev.png)
+![terraform-dev-workflow](images/terraform-dev.png)
 
 ### 2.2. Production
 #### CI/CD Pipeline
 - Path: [.github/workflows/pipeline.yml](.github/workflows/pipeline.yml)
 - Workflow: 
 
-![cicd-prod-workflow](/images/cicd-prod-workflow.png)
+![cicd-prod-workflow](images/cicd-prod-workflow.png)
 #### Infrastructure (with terraform)
 - Path: [infra/infra-prod/](infra/infra-prod/)
 - Workflow
 
-![terraform-prod-workflow](/images/terraform-prod.png)
+![terraform-prod-workflow](images/terraform-prod.png)
 
 #### Full-stack Architecture
 
-![full-stack](/images/full_architecture.png)
+![full-stack](images/full_architecture.png)
 
 #### App Architecture
 
-![architecture-prod](/images/coffee_shop_kubernetes_resources.png)
+![architecture-prod](images/coffee_shop_kubernetes_resources.png)
 
 #### ArgoCD Architecture
 
-![argocd](/images/argocd.png)
+![argocd](images/argocd.png)
 
 #### Ingress Architecture
 
-![ingress](/images/ingress.png)
+![ingress](images/ingress.png)
 
 #### Metrics Server Architecture
 
-![metric](/images/metrics.png)
+![metric](images/metrics.png)
 
 #### Monitoring Architecture
 
-![monitoring](/images/monitoring.png)
-## 3. Component description
+![monitoring](images/monitoring.png)
+
+## **3. Component description**
 ### 3.1 CI/CD Pipeline
 
 - **`on`**  
@@ -403,50 +415,49 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   --namespace monitoring
 ```
 
-## 4. The homepage of the application
+## **4. The homepage of the application**
 
 ### DEV
 ### 4.1. Homepage
 
-![homepage](/images/dev-homepage.png)
-
-
+![homepage](images/dev-homepage.png)
 
 ### PROD
 ### 4.1. Homepage
 
-![homepage](/images/homepage.png)
+![homepage](images/homepage.png)
 
 ### 4.2. Counter
 
-![counter](/images/counter.png)
+![counter](images/counter.png)
 
 ### 4.3. Order list
 
-![orderlist](/images/orderlist.png)
+![orderlist](images/orderlist.png)
 
 ### 4.4. ArgoCD UI
-![argocd-ui](/images/argocd-ui.png)
+![argocd-ui](images/argocd-ui.png)
 
 ### 4.5. K9s checking resources
-![k9s](/images/k9s.png)
+![k9s](images/k9s.png)
 
 ### 4.6. Prometheus targets enpoint
-![prom](/images/prom-targets.png)
+![prom](images/prom-targets.png)
 
 ### 4.7. Grafana UI
-![grafana](/images/grafana.png)
+![grafana](images/grafana.png)
 
 ### 4.8. Alerts
-![alert-grafana](/images/alert-grafana.png)
+![alert-grafana-1](images/alert-grafana.png)
 
-![alert-grafana](/images/firing.png)
+![alert-grafana-2](images/firing.png)
 
-![alert-grafana](/images/resolved.png)
-## 5. User guideline
+![alert-grafana-3](images/resolved.png)
 
-## 5.1 **Development environment**
-## 5.1.1 Resource
+## **5. User guideline**
+
+## **5.1. Development environment**
+## 5.1.1 **Resource**
 
 ## Prerequisites
 - Docker & Docker Compose installed  
@@ -563,7 +574,7 @@ docker-compose down --volumes
 docker rm -f coffeeshop-nginx
 ```
 
-## 5.1.2. IaC (Include automate deploy docker compose in EC2 and NGINX)
+## 5.1.2. **IaC (Include automate deploy docker compose in EC2 and NGINX)**
 ## 1. Provision State Backend & SSH Keys
 
 ### 1.1 Navigate to the `s3-backend` directory
@@ -774,9 +785,9 @@ _Verify:_
 
 - **Rotate SSH keys**: update your local public key files, then re-run the s3-backend deployment steps.  
 
-## 5.2. **Production environment**
+## **5.2. Production environment**
 ## 5.2.1 **Resource**
-### Directory Structure
+## Directory Structure
 
 ```
 prod
@@ -963,7 +974,8 @@ creation_rules:
     pgp: 38910E8EAC1F5E80B4CB32DCC135D0FD0B3392BD # Change this
 ```
 8. **Copy public key to ArgoCD UI**
-![gpg](/images/gpg.png)
+
+![gpg](images/gpg.png)
 
 ## Helm Setup and Installation
 
@@ -1015,10 +1027,8 @@ helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   --namespace monitoring
 ```
 
----
 
 ## Usage Notes
-
 - Use the `kustomization.yml` files to deploy or update resources via `kubectl apply -k <directory>`.  
 - Organize your deployment pipeline to apply manifests in dependency order,  secrets first, then services, then ingress.  
 - Helm charts are managed separately for critical components such as ingress-nginx, cert-manager, metrics-server, and monitoring stack.  
@@ -1107,8 +1117,8 @@ Or use the Argo CD web UI to view health, history, and logs.
 - Leverage Argo CD’s RBAC to manage team access  
 - Configure health checks and resource hooks in your manifests for better deployment control  
 - Use ApplicationSets for multi-cluster or multiple environment deployments  
+
 ## 5.2.3. **IaC**
-### Production Environment — User Guide
 
 ## Prerequisites
 
@@ -1300,7 +1310,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 ```
 - Same for grafana login
 ```
- kubectl -n monitoring get secret kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
+kubectl -n monitoring get secret kube-prometheus-stack-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
 ```
 
 - Dashboard and alert is suggested to be manually set up.
@@ -1367,13 +1377,13 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
             increase(nginx_ingress_controller_requests{namespace="ingress-nginx"}[1m])[1h:1m]
         )
         ```
-## 6. Room for improvement
+## **6. Room for improvement**
 - Monitoring custom metrics. E.g. Monitor messages on rabbitmq for HPA scaling.
 - Adding more healthcheck, especially on database.
 - Adding load test.
 - Checking on deployment strategy.
 
-## 7. References
+## **7. References**
 - https://nimtechnology.com/2022/07/03/argocd-ksops-encrypting-resource-on-kustomise-and-argocd/
 - https://cert-manager.io/docs/usage/certificate/
 - https://medium.com/@thecloudarchitect/continuous-delivery-with-argo-cd-and-jenkins-building-a-robust-ci-cd-pipeline-for-kubernetes-d8932a82a12f
